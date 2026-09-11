@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Behavior | Smart Attendance{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <div>
+    <h1>Behavior Analytics</h1>
+    <p class="muted">{{ selected_date.strftime('%A, %B %d, %Y') }}</p>
+  </div>
+  <form class="inline-controls" method="get">
+    <label>
+      <span>Date</span>
+      <input type="date" name="date" value="{{ selected_date.isoformat() }}">
+    </label>
+    <label>
+      <span>Student</span>
+      <select name="student_id">
+        <option value="">All Students</option>
+        {% for student in students %}
+          <option value="{{ student.id }}" {% if selected_student_id == student.id %}selected{% endif %}>
+            {{ student.roll_no }} — {{ student.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="button button-secondary" type="submit">Filter</button>
+    <a class="button button-ghost" href="{{ url_for('behavior_csv', date=selected_date.isoformat()) }}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      CSV
+    </a>
+    <a class="button button-ghost" href="{{ url_for('behavior_pdf', date=selected_date.isoformat()) }}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      PDF
+    </a>
+  </form>
+</header>
+
+<section class="content-grid two-columns">
+  <article class="panel">
+    <h2>Attention Score</h2>
+    <div class="chart-wrap">
+      <canvas id="behaviorScoreChart"></canvas>
+    </div>
+  </article>
+  <article class="panel">
+    <h2>Status Mix</h2>
+    <div class="chart-wrap">
+      <canvas id="behaviorStatusChart"></canvas>
+    </div>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Behavior Logs</h2>
+    <span class="badge badge-muted">{{ logs|length }} latest rows</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Roll No</th>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Score</th>
+          <th>EAR</th>
+          <th>Yaw</th>
+          <th>Pitch</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+          <tr>
+            <td>{{ log.timestamp.strftime("%H:%M:%S") }}</td>
+            <td>{{ log.student.roll_no }}</td>
+            <td style="color:var(--ink);font-weight:500">{{ log.student.name }}</td>
+            <td><span class="badge badge-{{ 'danger' if log.status == 'sleepy' else 'warning' if log.status == 'distracted' else 'success' }}">{{ log.status }}</span></td>
+            <td>{{ log.attention_score }}</td>
+            <td>{{ "%.3f"|format(log.ear) if log.ear is not none else "—" }}</td>
+            <td>{{ "%.1f"|format(log.head_yaw) if log.head_yaw is not none else "—" }}</td>
+            <td>{{ "%.1f"|format(log.head_pitch) if log.head_pitch is not none else "—" }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="8" class="empty">No behavior logs for this filter.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  window.behaviorSummary = {{ summary|tojson }};
+</script>
+{% endblock %}

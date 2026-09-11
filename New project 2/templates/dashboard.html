@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Smart Attendance{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="muted">{{ today.strftime('%A, %B %d, %Y') }}</p>
+  </div>
+  <a class="button button-primary" href="{{ url_for('live_attendance') }}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+    Start Attendance
+  </a>
+</header>
+
+<section class="stats-grid">
+  <article class="stat-card" style="--card-accent: var(--accent)">
+    <span>Total Students</span>
+    <strong>{{ total_students }}</strong>
+  </article>
+  <article class="stat-card" style="--card-accent: var(--green)">
+    <span>Present Today</span>
+    <strong style="background:linear-gradient(135deg, #22c55e 0%, #4ade80 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">{{ present_today }}</strong>
+  </article>
+  <article class="stat-card" style="--card-accent: var(--amber)">
+    <span>Avg Attention</span>
+    <strong style="background:linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">{{ avg_attention }}%</strong>
+  </article>
+  <article class="stat-card" style="--card-accent: var(--cyan)">
+    <span>Face Encodings</span>
+    <strong style="background:linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">{{ encodings_loaded }}</strong>
+  </article>
+</section>
+
+<section class="content-grid two-columns">
+  <article class="panel">
+    <div class="panel-header">
+      <h2>Behavior Overview</h2>
+      <a href="{{ url_for('behavior') }}">Details →</a>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="dashboardBehaviorChart"></canvas>
+    </div>
+  </article>
+
+  <article class="panel">
+    <div class="panel-header">
+      <h2>Recent Attendance</h2>
+      <a href="{{ url_for('attendance_records') }}">View all →</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Roll No</th>
+            <th>Name</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in recent_attendance %}
+            <tr>
+              <td>{{ record.student.roll_no }}</td>
+              <td style="color:var(--ink)">{{ record.student.name }}</td>
+              <td>{{ record.time.isoformat(timespec="seconds") }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="3" class="empty">No attendance marked today.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Recent Alerts</h2>
+    <span class="badge badge-muted">Last 15 min</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Roll No</th>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for alert in recent_alerts %}
+          <tr>
+            <td>{{ alert.timestamp.strftime("%H:%M:%S") }}</td>
+            <td>{{ alert.student.roll_no }}</td>
+            <td style="color:var(--ink)">{{ alert.student.name }}</td>
+            <td><span class="badge badge-danger">{{ alert.status }}</span></td>
+            <td>{{ alert.attention_score }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="empty">No active alerts.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  window.dashboardBehaviorSummary = {{ behavior_summary|tojson }};
+</script>
+{% endblock %}

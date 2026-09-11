@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Login | Smart Attendance{% endblock %}
+
+{% block content %}
+<section class="auth-panel">
+  <div style="text-align:center">
+    <div style="margin-bottom:16px">
+      <span class="brand-mark" style="width:56px;height:56px;font-size:18px;margin:0 auto">SA</span>
+    </div>
+    <h1 style="margin-bottom:6px">Smart Attendance</h1>
+    <p class="muted">Sign in to access your dashboard</p>
+  </div>
+  <form method="post" class="form-grid">
+    <label>
+      <span>Email Address</span>
+      <input type="email" name="email" required autocomplete="email" placeholder="admin@example.com">
+    </label>
+    <label>
+      <span>Password</span>
+      <input type="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
+    </label>
+    <button class="button button-primary" type="submit" style="margin-top:4px">Sign In</button>
+  </form>
+</section>
+{% endblock %}

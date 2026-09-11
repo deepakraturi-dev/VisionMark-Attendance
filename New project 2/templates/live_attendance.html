@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Live Attendance | Smart Attendance{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <div>
+    <h1>Live Attendance</h1>
+    <p class="muted">Face recognition marks attendance and logs behavior in real time.</p>
+  </div>
+  <div class="inline-controls">
+    <label>
+      <span>Camera</span>
+      <input id="attendanceCameraIndex" type="number" min="0" value="{{ default_camera }}">
+    </label>
+    <button class="button button-primary" id="startAttendanceFeed" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Start
+    </button>
+  </div>
+</header>
+
+<section class="panel">
+  <div class="video-frame video-frame-large">
+    <img id="attendanceFeed" alt="Live attendance feed" data-base-src="{{ url_for('video_attendance') }}">
+  </div>
+</section>
+{% endblock %}

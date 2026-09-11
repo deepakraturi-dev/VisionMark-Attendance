@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Face Dataset — {{ student.name }} | Smart Attendance{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <div>
+    <h1>{{ student.name }}</h1>
+    <p class="muted">{{ student.roll_no }} · {{ student.email }}</p>
+  </div>
+  <a class="button button-ghost" href="{{ url_for('students') }}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back
+  </a>
+</header>
+
+<section class="content-grid two-columns">
+  <article class="panel">
+    <div class="panel-header">
+      <h2>Camera Preview</h2>
+      <div class="inline-controls">
+        <label>
+          <span>Camera</span>
+          <input id="cameraIndex" type="number" min="0" value="0">
+        </label>
+        <label>
+          <span>Images</span>
+          <input id="captureCount" type="number" min="20" max="50" value="{{ default_count }}">
+        </label>
+      </div>
+    </div>
+    <div class="video-frame">
+      <img id="previewFeed" alt="Camera preview" data-base-src="{{ url_for('video_preview') }}">
+    </div>
+  </article>
+
+  <article class="panel">
+    <h2>Dataset Actions</h2>
+    <dl class="detail-list" style="margin-top:14px">
+      <div>
+        <dt>Dataset Folder</dt>
+        <dd>{{ student.dataset_path or "Not created yet" }}</dd>
+      </div>
+      <div>
+        <dt>Status</dt>
+        <dd>
+          <span class="badge {% if student.active %}badge-success{% else %}badge-muted{% endif %}">
+            {{ "Active" if student.active else "Inactive" }}
+          </span>
+        </dd>
+      </div>
+    </dl>
+    <div class="button-row">
+      <button
+        class="button button-primary"
+        id="captureButton"
+        data-url="{{ url_for('capture_student', student_id=student.id) }}"
+        type="button"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Capture Images
+      </button>
+      <button
+        class="button button-secondary"
+        id="trainButton"
+        data-url="{{ url_for('train_student', student_id=student.id) }}"
+        type="button"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        Train Student
+      </button>
+    </div>
+    <pre id="captureOutput" class="output-box"></pre>
+  </article>
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance | Smart Attendance{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <div>
+    <h1>Attendance</h1>
+    <p class="muted">{{ selected_date.strftime('%A, %B %d, %Y') }}</p>
+  </div>
+  <form class="inline-controls" method="get">
+    <label>
+      <span>Date</span>
+      <input type="date" name="date" value="{{ selected_date.isoformat() }}">
+    </label>
+    <button class="button button-secondary" type="submit">Filter</button>
+    <a class="button button-ghost" href="{{ url_for('daily_attendance_csv', date=selected_date.isoformat()) }}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      CSV
+    </a>
+    <a class="button button-ghost" href="{{ url_for('daily_attendance_pdf', date=selected_date.isoformat()) }}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      PDF
+    </a>
+  </form>
+</header>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Roll No</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in records %}
+          <tr>
+            <td>{{ record.student.roll_no }}</td>
+            <td style="color:var(--ink);font-weight:500">{{ record.student.name }}</td>
+            <td>{{ record.student.email }}</td>
+            <td>{{ record.date.isoformat() }}</td>
+            <td>{{ record.time.isoformat(timespec="seconds") }}</td>
+            <td><span class="badge badge-success">{{ record.status }}</span></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="empty">No records for this date.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
